@@ -37,10 +37,12 @@ public class PatientRepository : IPatientRepository
         
         return update.Entity;
     }
-
     
-    public async Task Delete(Patient patient)
+
+    public async Task DeleteAsync(Guid  patientId)
     {
+        var patient = await _dbContext.patients.FirstOrDefaultAsync(p => p.Id == patientId);
+        
         _dbContext.patients.Remove(patient);
     }
 }
