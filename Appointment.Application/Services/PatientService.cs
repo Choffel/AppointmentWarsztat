@@ -1,5 +1,6 @@
 ﻿using Appointment.Application.Contracts;
 using Appointment.Application.DTOs;
+using Appointment.Domain.Enums;
 using Appointment.Domain.Models;
 
 
@@ -8,25 +9,29 @@ namespace Appointment.Application.Services;
 public class PatientService : IPatientService
 {
     private readonly IPatientRepository _patientRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public PatientService(IPatientRepository patientRepository)
+    public PatientService(IPatientRepository patientRepository,  IUnitOfWork unitOfWork)
     {
+        _unitOfWork = unitOfWork;
         _patientRepository = patientRepository;
     }
 
-    public Task<Patient> Create(Patient patient)
+    public Task<Patient> Create(CreatePatientDto request)
     {
         var patientToCreate = new Patient
         {
             Id = Guid.NewGuid(),
-            Name = patient.Name,
-            Surname = patient.Surname,
-            DateOfBirth = patient.DateOfBirth,
-            Pesel = patient.Pesel,
-            Status = patient.Status 
+            Name = request.FirstName,
+            Surname = request.LastName,
+            DateOfBirth = request.DateOfBirth,
+            Pesel = request.Pesel,
+            Status = PatientStatus.Active
         };
         
         _patientRepository.Add(patientToCreate);
+        
+        _unitOfWork.SaveChangesAsync();
         
         return Task.FromResult(patientToCreate);
     }
@@ -44,21 +49,15 @@ public class PatientService : IPatientService
         exiting.Surname = request.Surname;
         exiting.Pesel = request.Pesel;
         
+        await _unitOfWork.SaveChangesAsync();
         return  await _patientRepository.Update(exiting);
     }
 
-    public Task<Patient> Delete(Guid patientId)
+    public async Task Delete(Guid patientId)
     {
-        var result = _patientRepository.GetById(patientId);
+        await _patientRepository.DeleteAsync(patientId);
         
-        if (result == null)
-        {
-            throw new Exception("Patient not found");
-        }
-        
-        _patientRepository.Delete(patientId);
-
-        return result;
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Patient> GetById(Guid id)
