@@ -12,6 +12,6 @@ public interface IPatientRepository
     
     Task<Patient> Update(Patient patient);
     
-    Task Delete(Guid patientId);
+    Task DeleteAsync(Guid patientId);
     
 }
