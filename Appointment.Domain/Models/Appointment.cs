@@ -8,5 +8,12 @@ public class Appointment
     
     public Guid PatientId { get; set; }
     
+    public string Description { get; set; }
+    
+    public DateTime StartTime { get; set; }
+    
+    public DateTime EndTime { get; set; }
+    
     public DateTime Date { get; set; }
+    public Patient? Patient { get; set; }
 }
