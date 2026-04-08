@@ -8,13 +8,13 @@ namespace Appointment.Application.Services;
 
 public class PatientService : IPatientService
 {
-    private readonly IPatientRepository _patientRepository;
     private readonly IUnitOfWork _unitOfWork;
+    
+    private readonly IRepository<Patient> _patientRepository;
 
-    public PatientService(IPatientRepository patientRepository,  IUnitOfWork unitOfWork)
+    public PatientService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _patientRepository = patientRepository;
     }
 
     public Task<Patient> Create(CreatePatientDto request)
@@ -30,8 +30,8 @@ public class PatientService : IPatientService
         };
         
         _patientRepository.Add(patientToCreate);
-        
-        _unitOfWork.SaveChangesAsync();
+
+        _unitOfWork.CommitAsync();
         
         return Task.FromResult(patientToCreate);
     }
@@ -48,16 +48,16 @@ public class PatientService : IPatientService
         exiting.Name = request.Name;
         exiting.Surname = request.Surname;
         exiting.Pesel = request.Pesel;
-        
-        await _unitOfWork.SaveChangesAsync();
-        return  await _patientRepository.Update(exiting);
+
+        await _unitOfWork.CommitAsync();
+        return _patientRepository.Update(exiting);
     }
 
     public async Task Delete(Guid patientId)
     {
-        await _patientRepository.DeleteAsync(patientId);
+        await _patientRepository.Delete(patientId);
         
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
     }
 
     public async Task<Patient> GetById(Guid id)
