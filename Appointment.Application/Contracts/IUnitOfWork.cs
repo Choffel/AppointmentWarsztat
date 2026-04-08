@@ -1,6 +1,12 @@
-﻿namespace Appointment.Application.Contracts;
+﻿using Appointment.Domain.Models;
 
-public interface IUnitOfWork
+namespace Appointment.Application.Contracts;
+
+public interface IUnitOfWork : IDisposable
 {
-    Task SaveChangesAsync();
+    IRepository<Patient> PatientRepository { get; } 
+    
+    IRepository<Domain.Models.Appointment> AppointmentRepository { get; }
+    
+    Task<int> CommitAsync();
 }
