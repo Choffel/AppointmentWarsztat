@@ -2,12 +2,12 @@ using Appointment.Application.Contracts;
 using Appointment.Application.Services;
 using Appointment.Domain.Models;
 using Appointment.Infrastructure.Data;
+using Appointment.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddSingleton<IDependencyEngine<Appointment.Domain.Models.Appointment, PlanTask>>(sp =>
 {
@@ -34,6 +35,8 @@ builder.Services.AddSingleton<IDependencyEngine<Appointment.Domain.Models.Appoin
 builder.Services.AddScoped<IUnitOfWork, IUnitOfWork>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 
+builder.Services.AddScoped<IUnitOfWork, IUnitOfWork>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 
 var app = builder.Build();
