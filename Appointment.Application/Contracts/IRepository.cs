@@ -4,6 +4,8 @@ public interface IRepository<T> where T : class
 {
     Task<List<T>> GetAll();
     
+    IQueryable<T> GetQueryable();
+    
     Task<T> GetById(Guid id);
     
     T Add(T entity);

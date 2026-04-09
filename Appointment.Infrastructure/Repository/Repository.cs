@@ -14,11 +14,15 @@ public class Repository<T> : IRepository<T> where T : class
         _context = context;
         _dbSet = context.Set<T>();
     }
-
-
+    
     public Task<List<T>> GetAll()
     {
-        throw new NotImplementedException();
+        return _dbSet.ToListAsync();
+    }
+
+    public IQueryable<T> GetQueryable()
+    {
+        return _dbSet.AsQueryable();
     }
 
     public async Task<T> GetById(Guid id)
