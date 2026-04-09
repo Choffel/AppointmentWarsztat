@@ -9,9 +9,9 @@ public class AppointmentMapper  : IAppointmentMapper
     {
         return new AppointmentResponseDto(
             appointment.Id,
-            appointment.Patient?.Name ?? "Unknown", // Безопасное обращение
+            appointment.Patient?.Name ?? "Unknown", 
             appointment.PatientId,
-            appointment.Id, // Пока нет DoctorId — используем Id (заменить потом)
+            appointment.DoctorId, 
             "Dr. Smith", // TODO: добавить Doctor в модель
             appointment.Date,
             appointment.StartTime,
