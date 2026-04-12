@@ -51,7 +51,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentResponseDto> GetAppointmentById(Guid patientId, Guid appointmentId)
     {
-        // Проверяем принадлежность пациенту
+        
         var appointment = await _appointments.GetById(appointmentId);
         
         if (appointment?.PatientId != patientId)
