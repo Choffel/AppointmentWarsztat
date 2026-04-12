@@ -3,6 +3,8 @@ using Appointment.Infrastructure.Data;
 
 namespace Appointment.Infrastructure;
 
+
+//TO DO починить эту хуету(ошибка в трейсе)
 public class UnitOfWork : IUnitOfWork
 {
     
