@@ -5,11 +5,11 @@ namespace Appointment.Application.Contracts;
 
 public interface IPatientService
 {
-    Task<Patient> Create(CreatePatientDto request);
+    Task<PatientResponse> Create(CreatePatientDto request);
     
-    Task<Patient> Update( Guid patientId, PatientUpdateDto request);
+    Task<PatientResponse> Update( Guid patientId, PatientUpdateDto request);
     
     Task Delete(Guid patientId);
     
-    Task<Patient> GetById(Guid id);
+    Task<PatientResponse> GetById(Guid id);
 }

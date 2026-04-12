@@ -1,6 +1,5 @@
 ﻿using Appointment.Application.Contracts;
 using Appointment.Application.DTOs;
-using Appointment.Domain.Enums;
 using Appointment.Domain.Models;
 
 
@@ -11,46 +10,62 @@ public class PatientService : IPatientService
     private readonly IUnitOfWork _unitOfWork;
     
     private readonly IRepository<Patient> _patientRepository;
+    private readonly IPatientMapper _mapper;
 
-    public PatientService(IUnitOfWork unitOfWork)
+    public PatientService(IUnitOfWork unitOfWork, IPatientMapper mapper, IRepository<Patient> patientRepository)
     {
+        _mapper = mapper;
+        _patientRepository = patientRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public Task<Patient> Create(CreatePatientDto request)
+    public async Task<PatientResponse> Create(CreatePatientDto dto)
     {
-        var patientToCreate = new Patient
-        {
-            Id = Guid.NewGuid(),
-            Name = request.FirstName,
-            Surname = request.LastName,
-            DateOfBirth = request.DateOfBirth,
-            Pesel = request.Pesel,
-            Status = PatientStatus.Active
-        };
+        var patient = new Patient(
+            Guid.NewGuid(),
+            dto.FirstName,
+            dto.LastName,
+            dto.DateOfBirth,
+            dto.Pesel,
+            dto.Email,
+            dto.PhoneNumber,
+            dto.Address,
+            dto.City,
+            dto.Gender
+        );
+            
         
-        _patientRepository.Add(patientToCreate);
+        _patientRepository.Add(patient);
 
-        _unitOfWork.CommitAsync();
+        await _unitOfWork.CommitAsync();
         
-        return Task.FromResult(patientToCreate);
+        return _mapper.ToResponse(patient);
     }
 
-    public async  Task<Patient> Update(Guid patientId,PatientUpdateDto request)
+    public async  Task<PatientResponse> Update(Guid patientId,PatientUpdateDto request)
     {
-        var exiting = await _patientRepository.GetById(patientId);
+        var existing = await _patientRepository.GetById(patientId);
 
-        if (exiting == null)
+        if (existing == null)
         {
             throw new Exception("Patient not found");
         }
         
-        exiting.Name = request.Name;
-        exiting.Surname = request.Surname;
-        exiting.Pesel = request.Pesel;
-
+        existing.UpdateInfo(
+           request.Name,
+           request.Surname,
+           existing.DateOfBirth,
+           request.Pesel,
+           existing.Email,
+           existing.PhoneNumber,
+           existing.Address,
+           existing.City,
+           existing.Gender
+        );
+        
         await _unitOfWork.CommitAsync();
-        return _patientRepository.Update(exiting);
+        
+        return _mapper.ToResponse(existing);
     }
 
     public async Task Delete(Guid patientId)
@@ -60,8 +75,15 @@ public class PatientService : IPatientService
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task<Patient> GetById(Guid id)
+    public async Task<PatientResponse> GetById(Guid id)
     {
-        return await _patientRepository.GetById(id);
+        var result = await _patientRepository.GetById(id);
+
+        if (result == null)
+        {
+            throw new Exception("Patient not found");
+        }
+        
+        return _mapper.ToResponse(result);
     }
 }
