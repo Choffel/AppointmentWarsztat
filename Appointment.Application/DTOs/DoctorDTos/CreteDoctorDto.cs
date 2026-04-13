@@ -5,7 +5,8 @@ public record CreateDoctorDto(
     string LastName,
     string Email,
     string PhoneNumber,
-    string Password,
     string Specialty,
     string Address,
-    string City);
+    string City,
+    string Password
+    );

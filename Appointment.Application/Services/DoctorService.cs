@@ -7,6 +7,7 @@ namespace Appointment.Application.Services;
 public class DoctorService : IDoctorService
 {
     private readonly IRepository<Doctor> _doctorRepository;
+    private readonly IRepository<Account> _accountRepository;
     private readonly IDoctorMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -19,16 +20,21 @@ public class DoctorService : IDoctorService
 
     public async Task<ResponseDoctorDto> CreateAsync(CreateDoctorDto dto)
     {
-        var doctor = new Doctor(
-            firstName: dto.FirstName,
-            lastName: dto.LastName,
-            email: dto.Email,
-            phoneNumber: dto.PhoneNumber,
-            specialty: dto.Specialty,
-            address: dto.Address,
-            sity: dto.City
+        //hashing passworda
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        
+        var (account, doctor) = Doctor.CreateWithAccount(
+            dto.FirstName,
+            dto.LastName,
+            dto.Email,
+            dto.PhoneNumber,
+            dto.Specialty,
+            dto.Address,
+            dto.City,
+            passwordHash
         );
-
+        
+        _accountRepository.Add(account);
         _doctorRepository.Add(doctor);
         await _unitOfWork.CommitAsync();
 
@@ -45,13 +51,9 @@ public class DoctorService : IDoctorService
         }
 
         existing.UpdateInfo(
-            dto.FirstName,
-            dto.LastName,
-            dto.Email,
-            dto.PhoneNumber,
-            dto.Specialty,
-            dto.Address,
-            dto.City
+            specialty: dto.Specialty,
+            address: dto.Address,
+            city: dto.City
         );
 
         await _unitOfWork.CommitAsync();
