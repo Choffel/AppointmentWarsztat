@@ -2,7 +2,7 @@
 
 namespace Appointment.Application.Contracts;
 
-public interface IDoctorRepository
+public interface IDoctorRepository : IRepository<Doctor>
 {
     Task<Doctor> GetByIdWithAccount(Guid id);
 }
