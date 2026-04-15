@@ -12,10 +12,10 @@ public class PatientMapper : IPatientMapper
 
         return new PatientResponse(
             patient.Id,
-            patient.FirstName,
-            patient.LastName,
-            patient.Email,
-            patient.PhoneNumber,
+            patient.Account.FirstName,
+            patient.Account.LastName,
+            patient.Account.Email,
+            patient.Account.PhoneNumber,
             patient.Gender,
             patient.DateOfBirth,
             patient.Address,

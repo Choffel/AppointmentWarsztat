@@ -9,75 +9,85 @@ public class PatientService : IPatientService
 {
     private readonly IUnitOfWork _unitOfWork;
     
-    private readonly IRepository<Patient> _patientRepository;
+    private readonly IRepository<Patient> _repository;
+    private readonly IRepository<Account> _accountRepository;
+    private readonly IPatientRepository _patientRepository;
+    
     private readonly IPatientMapper _mapper;
 
-    public PatientService(IUnitOfWork unitOfWork, IPatientMapper mapper, IRepository<Patient> patientRepository)
+    public PatientService(IUnitOfWork unitOfWork, IPatientMapper mapper, IRepository<Patient> repository, IPatientRepository patientRepository)
     {
-        _mapper = mapper;
         _patientRepository = patientRepository;
+        _mapper = mapper;
+        _repository = repository;
         _unitOfWork = unitOfWork;
     }
 
     public async Task<PatientResponse> Create(CreatePatientDto dto)
     {
-        var patient = new Patient(
-            Guid.NewGuid(),
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        
+        var (account, patient) = Patient.CreateWithAccount(
             dto.FirstName,
             dto.LastName,
-            dto.DateOfBirth,
-            dto.Pesel,
             dto.Email,
             dto.PhoneNumber,
+            dto.DateOfBirth,
+            dto.Pesel,
             dto.Address,
             dto.City,
-            dto.Gender
+            dto.Gender,
+            passwordHash
         );
-            
         
-        _patientRepository.Add(patient);
+       
+        _accountRepository.Add(account);
+        _repository.Add(patient);
 
         await _unitOfWork.CommitAsync();
+    
         
         return _mapper.ToResponse(patient);
     }
 
-    public async  Task<PatientResponse> Update(Guid patientId,PatientUpdateDto request)
+    public async Task<PatientResponse> Update(Guid patientId, PatientUpdateDto request)
     {
-        var existing = await _patientRepository.GetById(patientId);
+        
+        var existing = await _patientRepository.GetByIdWitchAccountAsync(patientId);
 
         if (existing == null)
         {
             throw new Exception("Patient not found");
         }
+    
         
-        existing.UpdateInfo(
-           request.Name,
-           request.Surname,
-           existing.DateOfBirth,
-           request.Pesel,
-           existing.Email,
-           existing.PhoneNumber,
-           existing.Address,
-           existing.City,
-           existing.Gender
-        );
+        existing.Account.FirstName = request.Name;
+        existing.Account.LastName = request.Surname;
         
+        
+        // existing.UpdateInfo(
+        //     request.DateOfBirth,
+        //     request.Pesel,
+        //     request.Address,
+        //     request.City,
+        //     request.Gender
+        // );
+    
         await _unitOfWork.CommitAsync();
-        
+    
         return _mapper.ToResponse(existing);
     }
 
     public async Task Delete(Guid patientId)
     {
-        await _patientRepository.Delete(patientId);
+        await _repository.Delete(patientId);
         
         await _unitOfWork.CommitAsync();
     }
 
     public async Task<PatientResponse> GetById(Guid id)
     {
-        var result = await _patientRepository.GetById(id);
+        var result = await _repository.GetById(id);
 
         if (result == null)
         {

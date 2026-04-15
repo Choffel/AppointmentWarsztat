@@ -9,7 +9,7 @@ public class AppointmentMapper  : IAppointmentMapper
     {
         return new AppointmentResponseDto(
             appointment.Id,
-            appointment.Patient?.FirstName ?? "Unknown", 
+            appointment.Patient?.Account.FirstName ?? "Unknown", 
             appointment.PatientId,
             appointment.DoctorId, 
             "Dr. Smith", // TODO: добавить Doctor в модель
