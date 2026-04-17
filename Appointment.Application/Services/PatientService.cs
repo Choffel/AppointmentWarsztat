@@ -15,8 +15,9 @@ public class PatientService : IPatientService
     
     private readonly IPatientMapper _mapper;
 
-    public PatientService(IUnitOfWork unitOfWork, IPatientMapper mapper, IRepository<Patient> repository, IPatientRepository patientRepository)
+    public PatientService(IUnitOfWork unitOfWork, IPatientMapper mapper, IRepository<Patient> repository, IPatientRepository patientRepository,IRepository<Account> accountRepository)
     {
+        _accountRepository = accountRepository;
         _patientRepository = patientRepository;
         _mapper = mapper;
         _repository = repository;
