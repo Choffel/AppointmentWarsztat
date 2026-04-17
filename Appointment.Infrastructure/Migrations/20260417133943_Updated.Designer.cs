@@ -3,6 +3,7 @@ using System;
 using Appointment.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Appointment.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260417133943_Updated")]
+    partial class Updated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,8 +33,7 @@ namespace Appointment.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -57,7 +59,7 @@ namespace Appointment.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Accounts", (string)null);
+                    b.ToTable("accounts");
                 });
 
             modelBuilder.Entity("Appointment.Domain.Models.Appointment", b =>
@@ -94,7 +96,7 @@ namespace Appointment.Infrastructure.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Appointments", (string)null);
+                    b.ToTable("appointments");
                 });
 
             modelBuilder.Entity("Appointment.Domain.Models.Doctor", b =>
@@ -116,7 +118,7 @@ namespace Appointment.Infrastructure.Migrations
 
                     b.HasKey("DoctorId");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.ToTable("doctors");
                 });
 
             modelBuilder.Entity("Appointment.Domain.Models.Patient", b =>
@@ -148,7 +150,7 @@ namespace Appointment.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Patients", (string)null);
+                    b.ToTable("patients");
                 });
 
             modelBuilder.Entity("Appointment.Domain.Models.Appointment", b =>

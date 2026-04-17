@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using Appointment.Application.Contracts;
 
 namespace Appointment.Infrastructure;

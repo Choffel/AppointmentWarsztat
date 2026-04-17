@@ -34,24 +34,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //     return engine;
 // });
 
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
-builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
-builder.Services.AddScoped<IRepository<Appointment.Domain.Models.Appointment>, Repository<Appointment.Domain.Models.Appointment>>();
-builder.Services.AddScoped<IRepository<Doctor>, Repository<Doctor>>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-builder.Services.AddScoped<IPatientService, PatientService>();
+
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+
+
 builder.Services.AddScoped<IPatientMapper, PatientMapper>();
-
-builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<IAppointmentChecker,AppointmentChecker>();
 builder.Services.AddScoped<IAppointmentMapper, AppointmentMapper>();
-
-builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDoctorMapper, DoctorMapper>();
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IAppointmentChecker, AppointmentChecker>();
+builder.Services.AddScoped<IDoctorService, DoctorService>();
 
 
 builder.Services.AddSwaggerGen();
