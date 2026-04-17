@@ -10,10 +10,13 @@ public class AppointmentService : IAppointmentService
     private readonly IUnitOfWork _uow;
     private readonly IAppointmentMapper _mapper;
     private readonly IRepository<Domain.Models.Appointment> _appointments;
+    private readonly IRepository<Domain.Models.Patient> _patients;
     private readonly IAppointmentChecker _checker;
 
-    public AppointmentService(IUnitOfWork uow, IAppointmentMapper mapper,  IRepository<Domain.Models.Appointment> appointments,  IAppointmentChecker checker)
+    public AppointmentService(IUnitOfWork uow, IAppointmentMapper mapper,
+        IRepository<Domain.Models.Appointment> appointments,  IAppointmentChecker checker, IRepository<Domain.Models.Patient> patients)
     {
+        _patients = patients;
         _checker = checker;
         _appointments = appointments;
         _uow = uow;
@@ -22,7 +25,9 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentResponseDto> CreateAppointment(CreateAppointmentDto dto)
     {
-        var patient = await _appointments.GetById(dto.PatientId);
+         // var patient = await _appointments.GetById(dto.PatientId);
+         
+         var patient = await  _patients.GetById(dto.PatientId);
         
         await _checker.HasOverlappingAppointmentAsync(dto.DoctorId, Guid.Empty, dto.Date,  dto.EndTime, dto.StartTime);
         

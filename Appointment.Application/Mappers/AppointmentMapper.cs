@@ -7,12 +7,18 @@ public class AppointmentMapper  : IAppointmentMapper
 {
     public  AppointmentResponseDto ToResponseDto(Domain.Models.Appointment appointment)
     {
+        string patientName = $"{appointment.Patient?.Account?.FirstName} {appointment.Patient?.Account?.LastName}".Trim();
+        if (string.IsNullOrWhiteSpace(patientName)) patientName = "Unknown Patient";
+
+        string doctorName = $"Dr. {appointment.Doctor?.Account?.LastName}".Trim();
+        if (doctorName == "Dr.") doctorName = "Unknown Doctor";
+
         return new AppointmentResponseDto(
             appointment.Id,
-            appointment.Patient?.Account.FirstName ?? "Unknown", 
+            patientName, 
             appointment.PatientId,
             appointment.DoctorId, 
-            "Dr. Smith", // TODO: добавить Doctor в модель
+            doctorName, 
             appointment.Date,
             appointment.StartTime,
             appointment.EndTime,
