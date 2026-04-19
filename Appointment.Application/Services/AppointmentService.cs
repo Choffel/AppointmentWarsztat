@@ -12,10 +12,14 @@ public class AppointmentService : IAppointmentService
     private readonly IRepository<Domain.Models.Appointment> _appointments;
     private readonly IRepository<Domain.Models.Patient> _patients;
     private readonly IAppointmentChecker _checker;
+    
+    private readonly IDependencyEngine<CreateAppointmentDto, Domain.Models.Appointment> _engine;
 
     public AppointmentService(IUnitOfWork uow, IAppointmentMapper mapper,
-        IRepository<Domain.Models.Appointment> appointments,  IAppointmentChecker checker, IRepository<Domain.Models.Patient> patients)
+        IRepository<Domain.Models.Appointment> appointments,  IAppointmentChecker checker, IRepository<Domain.Models.Patient> patients,
+        IDependencyEngine<CreateAppointmentDto, Domain.Models.Appointment> engine)
     {
+        _engine = engine;
         _patients = patients;
         _checker = checker;
         _appointments = appointments;
@@ -25,9 +29,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentResponseDto> CreateAppointment(CreateAppointmentDto dto)
     {
-         // var patient = await _appointments.GetById(dto.PatientId);
-         
-         var patient = await  _patients.GetById(dto.PatientId);
+        var patient = await  _patients.GetById(dto.PatientId);
         
         await _checker.HasOverlappingAppointmentAsync(dto.DoctorId, Guid.Empty, dto.Date,  dto.EndTime, dto.StartTime);
         
@@ -45,6 +47,23 @@ public class AppointmentService : IAppointmentService
             Description = "",  
             Status = AppointmentStatus.Pending
         };
+        
+        _engine
+            .IfThen(
+                (src, target) => src.StartTime != default,
+                (src, target) => target.StartTime = src.StartTime
+            )
+            .IfThen(
+                (src, target) => src.EndTime != default,
+                (src, target) => target.EndTime = src.EndTime
+            )
+            .IfThen(
+                (src, target) => string.IsNullOrEmpty(src.Description),
+                (src, target) => target.Description = "Cos tutaj"
+            );
+
+        
+        _engine.Apply(dto, appointment);
 
         _appointments.Add(appointment);
         await _uow.CommitAsync();
