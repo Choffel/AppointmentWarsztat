@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Domain.Models.Appointment> appointments { get; set; }
     public DbSet<Doctor> doctors { get; set; }
     public DbSet<Account> accounts { get; set; }
+    public DbSet<MedicalResult> medicalResults { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,6 +86,16 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(a => a.Doctor)
                 .WithMany(d => d.Appointments)
                 .HasForeignKey(a => a.DoctorId);
+        });
+
+        modelBuilder.Entity<MedicalResult>(entity =>
+        {
+            entity.ToTable("MedicalResults");
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.TestName).IsRequired().HasMaxLength(120);
+            entity.Property(m => m.Unit).IsRequired().HasMaxLength(32);
+            entity.Property(m => m.PatientName).IsRequired().HasMaxLength(200);
+            entity.Property(m => m.ProcessedAtUtc).IsRequired();
         });
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Appointment.Application.Contracts;
+using Appointment.Domain.Models;
 using Appointment.Infrastructure.Data;
 
 namespace Appointment.Infrastructure;
 
-
-//TO DO починить эту хуету(ошибка в трейсе)
 public class UnitOfWork : IUnitOfWork
 {
     
@@ -14,10 +13,17 @@ public class UnitOfWork : IUnitOfWork
     
     public IRepository<Domain.Models.Patient> PatientRepository { get; }
 
-    public UnitOfWork(ApplicationDbContext dbContext,  IRepository<Domain.Models.Appointment> appointmentRepository,IRepository<Domain.Models.Patient> patientRepository)
+    public IRepository<MedicalResult> MedicalResultRepository { get; }
+
+    public UnitOfWork(
+        ApplicationDbContext dbContext,
+        IRepository<Domain.Models.Appointment> appointmentRepository,
+        IRepository<Domain.Models.Patient> patientRepository,
+        IRepository<MedicalResult> medicalResultRepository)
     {
         PatientRepository = patientRepository;
         AppointmentRepository = appointmentRepository;
+        MedicalResultRepository = medicalResultRepository;
         _dbContext = dbContext;
     }
     
